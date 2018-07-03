@@ -404,11 +404,6 @@ struct Tile
 	short bottom;
 };
 
-struct DPiece
-{
-	short blocks;
-};
-
 struct _SNETVERSIONDATA
 {
 	int size;
@@ -733,10 +728,10 @@ struct ObjectStruct
 	int _oAnimWidth;
 	int _oAnimWidth2;
 	int _oDelFlag;
-	int _oBreak;
+	char _oBreak; // check
 	int _oSolidFlag;
 	int _oMissFlag;
-	int _oSelFlag;
+	char _oSelFlag; // check
 	int _oPreFlag;
 	int _oTrapFlag;
 	int _oDoorFlag;

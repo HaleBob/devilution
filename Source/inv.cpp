@@ -2505,17 +2505,17 @@ int __fastcall CanPut(int i, int j)
 	v7 = v6 < 0;
 	if ( v6 > 0 )
 	{
-		if ( _LOBYTE(object[v6-1]._oSelFlag) ) /* check */
+		if ( object[v6-1]._oSelFlag ) /* check */
 			return 0;
 		v7 = v6 < 0;
 	}
-	if ( v7 && _LOBYTE(object[-(v6 + 1)]._oSelFlag) )
+	if ( v7 && object[-(v6 + 1)]._oSelFlag )
 		return 0;
 	v8 = dObject[v2 + 1][j];
 	if ( v8 > 0 )
 	{
 		v9 = dObject[v2][j + 1];
-		if ( v9 > 0 && _LOBYTE(object[v8-1]._oSelFlag) && _LOBYTE(object[v9-1]._oSelFlag) )
+		if ( v9 > 0 && object[v8-1]._oSelFlag && object[v9-1]._oSelFlag )
 			return 0;
 	}
 	if ( !currlevel && (dMonster[0][v3] || dMonster[1][v3 + 1]) )
@@ -3017,7 +3017,7 @@ bool __cdecl UseScroll()
 	signed int v4; // esi
 	int *v5; // ecx
 
-	if ( pcurs != CURSOR_HAND || !leveltype && !*(_DWORD *)&spelldata[plr[myplr]._pRSpell].sTownSpell )
+	if ( pcurs != CURSOR_HAND || leveltype == DTYPE_TOWN && !*(_DWORD *)&spelldata[plr[myplr]._pRSpell].sTownSpell )
 		return 0;
 	v0 = myplr;
 	v1 = 0;

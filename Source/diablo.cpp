@@ -92,8 +92,8 @@ void __cdecl FreeGameMem()
 	v1 = pMegaTiles;
 	pMegaTiles = 0;
 	mem_free_dbg(v1);
-	v2 = *(void **)&dpiece_defs[0].blocks;
-	*(_DWORD *)&dpiece_defs[0].blocks = 0;
+	v2 = pLevelPieces;
+	pLevelPieces = 0;
 	mem_free_dbg(v2);
 	v3 = level_special_cel;
 	level_special_cel = 0;
@@ -932,7 +932,7 @@ LABEL_48:
 		CheckLvlBtn();
 	if ( lvlbtndown )
 		return 0;
-	if ( leveltype )
+	if ( leveltype != DTYPE_TOWN )
 	{
 		v7 = abs(plr[myplr].WorldX - cursmx) < 2 && abs(plr[myplr].WorldY - cursmy) < 2;
 		_HIWORD(v8) = _HIWORD(pcurs);
@@ -948,10 +948,9 @@ LABEL_96:
 		}
 		if ( pcursobj != -1 )
 		{
-			if ( v1 != 5 || v7 && (v7 = 120 * pcursobj, *((_BYTE *)&object[0]._oBreak + v7) == 1) )
+			if ( v1 != 5 || v7 && object[pcursobj]._oBreak == 1 )
 			{
-				_LOWORD(v7) = pcursobj;
-				NetSendCmdLocParam1(1u, (pcurs == 5) + CMD_OPOBJXY, cursmx, cursmy, v7);
+				NetSendCmdLocParam1(1u, (pcurs == 5) + CMD_OPOBJXY, cursmx, cursmy, pcursobj);
 				goto LABEL_95;
 			}
 		}
@@ -1294,7 +1293,7 @@ LABEL_113:
 								chrflag = 0;
 								sbookflag = 0;
 								spselflag = 0;
-								if ( qtextflag && !leveltype )
+								if ( qtextflag && leveltype == DTYPE_TOWN)
 								{
 									qtextflag = 0;
 									sfx_stop();
@@ -1418,7 +1417,7 @@ LABEL_106:
 										chrflag = 0;
 										sbookflag = 0;
 										spselflag = 0;
-										if ( qtextflag && !leveltype )
+										if ( qtextflag && leveltype == DTYPE_TOWN )
 										{
 											qtextflag = 0;
 											sfx_stop();
@@ -1798,61 +1797,42 @@ LABEL_27:
 
 void __cdecl LoadLvlGFX()
 {
-	unsigned char *v0; // eax
-	char *v1; // ecx
-	unsigned char *v2; // eax
-	char *v3; // ecx
-	unsigned char *v4; // eax
-	char *v5; // ecx
-
-	if ( !leveltype )
+	switch(leveltype)
 	{
-		pDungeonCels = LoadFileInMem("Levels\\TownData\\Town.CEL", 0);
-		pMegaTiles = LoadFileInMem("Levels\\TownData\\Town.TIL", 0);
-		v4 = LoadFileInMem("Levels\\TownData\\Town.MIN", 0);
-		v5 = "Levels\\TownData\\TownS.CEL";
-		goto LABEL_14;
-	}
-	if ( leveltype == 1 )
-	{
-		pDungeonCels = LoadFileInMem("Levels\\L1Data\\L1.CEL", 0);
-		v2 = LoadFileInMem("Levels\\L1Data\\L1.TIL", 0);
-		v3 = "Levels\\L1Data\\L1.MIN";
-		goto LABEL_12;
-	}
-	if ( leveltype != 2 )
-	{
-		if ( leveltype != 3 )
-		{
-			if ( leveltype != 4 )
-			{
-				TermMsg("LoadLvlGFX");
-				return;
-			}
+		case DTYPE_TOWN:
+			pDungeonCels = LoadFileInMem("Levels\\TownData\\Town.CEL", 0);
+			pMegaTiles = LoadFileInMem("Levels\\TownData\\Town.TIL", 0);
+			pLevelPieces = LoadFileInMem("Levels\\TownData\\Town.MIN", 0);
+			level_special_cel = LoadFileInMem("Levels\\TownData\\TownS.CEL", 0);
+			break;
+		case DTYPE_CATHEDRAL:
+			pDungeonCels = LoadFileInMem("Levels\\L1Data\\L1.CEL", 0);
+			pMegaTiles = LoadFileInMem("Levels\\L1Data\\L1.TIL", 0);
+			pLevelPieces = LoadFileInMem("Levels\\L1Data\\L1.MIN", 0);
+			level_special_cel = LoadFileInMem("Levels\\L1Data\\L1S.CEL", 0);
+			break;
+		case DTYPE_CATACOMBS:
+			pDungeonCels = LoadFileInMem("Levels\\L2Data\\L2.CEL", 0);
+			pMegaTiles = LoadFileInMem("Levels\\L2Data\\L2.TIL", 0);
+			pLevelPieces = LoadFileInMem("Levels\\L2Data\\L2.MIN", 0);
+			level_special_cel = LoadFileInMem("Levels\\L2Data\\L2S.CEL", 0);
+			break;
+		case DTYPE_CAVES:
+			pDungeonCels = LoadFileInMem("Levels\\L3Data\\L3.CEL", 0);
+			pMegaTiles = LoadFileInMem("Levels\\L3Data\\L3.TIL", 0);
+			pLevelPieces = LoadFileInMem("Levels\\L3Data\\L3.MIN", 0);
+			level_special_cel = LoadFileInMem("Levels\\L1Data\\L1S.CEL", 0);
+			break;
+		case DTYPE_HELL:
 			pDungeonCels = LoadFileInMem("Levels\\L4Data\\L4.CEL", 0);
-			v0 = LoadFileInMem("Levels\\L4Data\\L4.TIL", 0);
-			v1 = "Levels\\L4Data\\L4.MIN";
-			goto LABEL_10;
-		}
-		pDungeonCels = LoadFileInMem("Levels\\L3Data\\L3.CEL", 0);
-		v2 = LoadFileInMem("Levels\\L3Data\\L3.TIL", 0);
-		v3 = "Levels\\L3Data\\L3.MIN";
-LABEL_12:
-		pMegaTiles = v2;
-		v4 = LoadFileInMem(v3, 0);
-		v5 = "Levels\\L1Data\\L1S.CEL";
-		goto LABEL_14;
+			pMegaTiles = LoadFileInMem("Levels\\L4Data\\L4.TIL", 0);
+			pLevelPieces = LoadFileInMem("Levels\\L4Data\\L4.MIN", 0);
+			level_special_cel = LoadFileInMem("Levels\\L2Data\\L2S.CEL", 0);
+			break;
+		default:
+			TermMsg("LoadLvlGFX");
+			return;
 	}
-	pDungeonCels = LoadFileInMem("Levels\\L2Data\\L2.CEL", 0);
-	v0 = LoadFileInMem("Levels\\L2Data\\L2.TIL", 0);
-	v1 = "Levels\\L2Data\\L2.MIN";
-LABEL_10:
-	pMegaTiles = v0;
-	v4 = LoadFileInMem(v1, 0);
-	v5 = "Levels\\L2Data\\L2S.CEL";
-LABEL_14:
-	*(_DWORD *)&dpiece_defs[0].blocks = (unsigned int)v4;
-	level_special_cel = LoadFileInMem(v5, 0);
 }
 // 5BB1ED: using guessed type char leveltype;
 
@@ -1873,30 +1853,30 @@ void __fastcall CreateLevel(int lvldir)
 
 	switch ( leveltype )
 	{
-		case 0:
+		case DTYPE_TOWN:
 			CreateTown(lvldir);
 			InitTownTriggers();
 			hnd = 0;
 			break;
-		case 1:
+		case DTYPE_CATHEDRAL:
 			CreateL5Dungeon(glSeedTbl[currlevel], lvldir);
 			InitL1Triggers();
 			Freeupstairs();
 			hnd = 1;
 			break;
-		case 2:
+		case DTYPE_CATACOMBS:
 			CreateL2Dungeon(glSeedTbl[currlevel], lvldir);
 			InitL2Triggers();
 			Freeupstairs();
 			hnd = 2;
 			break;
-		case 3:
+		case DTYPE_CAVES:
 			CreateL3Dungeon(glSeedTbl[currlevel], lvldir);
 			InitL3Triggers();
 			Freeupstairs();
 			hnd = 3;
 			break;
-		case 4:
+		case DTYPE_HELL:
 			CreateL4Dungeon(glSeedTbl[currlevel], lvldir);
 			InitL4Triggers();
 			Freeupstairs();
@@ -1945,11 +1925,11 @@ void __fastcall LoadGameLevel(bool firstflag, int lvldir)
 		InitHelp();
 	}
 	SetRndSeed(glSeedTbl[currlevel]);
-	if ( !leveltype )
+	if ( leveltype == DTYPE_TOWN)
 		SetupTownStores();
 	IncProgress();
 	InitAutomap();
-	if ( leveltype && lvldir != 4 )
+	if ( leveltype != DTYPE_TOWN && lvldir != 4 )
 	{
 		InitLighting();
 		InitVision();
@@ -1962,7 +1942,7 @@ void __fastcall LoadGameLevel(bool firstflag, int lvldir)
 		IncProgress();
 		FillSolidBlockTbls();
 		SetRndSeed(glSeedTbl[currlevel]);
-		if ( leveltype )
+		if ( leveltype != DTYPE_TOWN )
 		{
 			GetLevelMTypes();
 			InitThemes();
@@ -2007,7 +1987,7 @@ void __fastcall LoadGameLevel(bool firstflag, int lvldir)
 			}
 		}
 		SetRndSeed(glSeedTbl[currlevel]);
-		if ( leveltype )
+		if ( leveltype != DTYPE_TOWN)
 		{
 			if ( firstflag || lvldir == 4 || !plr[myplr]._pLvlVisited[currlevel] || gbMaxPlayers != 1 )
 			{
@@ -2120,7 +2100,7 @@ LABEL_72:
 		}
 	}
 
-	if ( leveltype )
+	if ( leveltype != DTYPE_TOWN )
 		SetDungeonMicros();
 	InitLightMax();
 	IncProgress();
@@ -2130,7 +2110,7 @@ LABEL_72:
 		InitControlPan();
 		IncProgress();
 	}
-	if ( leveltype )
+	if ( leveltype != DTYPE_TOWN)
 	{
 		ProcessLightList();
 		ProcessVisionList();
@@ -2202,7 +2182,7 @@ void __cdecl game_logic()
 			}
 			if ( gbProcessPlayers )
 				ProcessPlayers();
-			if ( leveltype )
+			if ( leveltype != DTYPE_TOWN )
 			{
 				ProcessMonsters();
 				ProcessObjects();
@@ -2277,11 +2257,11 @@ void __cdecl diablo_color_cyc_logic()
 		color_cycle_timer = v0;
 		if ( palette_get_colour_cycling() )
 		{
-			if ( leveltype == 4 )
+			if ( leveltype == DTYPE_HELL )
 			{
 				lighting_color_cycling();
 			}
-			else if ( leveltype == 3 )
+			else if ( leveltype == DTYPE_CAVES )
 			{
 				if ( fullscreen )
 					palette_update_caves();
